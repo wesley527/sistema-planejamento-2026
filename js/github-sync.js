@@ -3,28 +3,14 @@ const GITHUB_USER = 'wesley527';
 const GITHUB_REPO = 'sistema-planejamento-2026';
 const FILE_PATH = 'database/db.json';
 
-// Obter token do localStorage (sem pedir se não existir)
+// Obter token do localStorage (já deve estar salvo)
 function getGitHubToken() {
   return localStorage.getItem('github_token') || null;
 }
 
-// Pedir token ao usuário (chamado apenas quando necessário)
-function promptForToken() {
-  const token = prompt('Digite seu GitHub Personal Access Token:\n(Deixe em branco para usar apenas localStorage)');
-  if (token) {
-    localStorage.setItem('github_token', token);
-    return token;
-  }
-  return null;
-}
-
 const GitHubSync = {
   async save(tasks) {
-    let GITHUB_TOKEN = getGitHubToken();
-    
-    if (!GITHUB_TOKEN) {
-      GITHUB_TOKEN = promptForToken();
-    }
+    const GITHUB_TOKEN = getGitHubToken();
     
     if (!GITHUB_TOKEN) {
       console.warn('Token do GitHub não configurado. Salvando apenas localmente.');
@@ -96,7 +82,7 @@ const GitHubSync = {
   },
 
   async load() {
-    let GITHUB_TOKEN = getGitHubToken();
+    const GITHUB_TOKEN = getGitHubToken();
     
     if (!GITHUB_TOKEN) {
       console.warn('Token do GitHub não configurado. Carregando do localStorage.');
