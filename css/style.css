@@ -1,0 +1,136 @@
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:'Inter',sans-serif;
+  background:linear-gradient(135deg,#001933,#003cff,#00c6ff);
+  color:#fff;
+  min-height:100vh;
+  padding:12px;
+}
+
+.container{max-width:1400px;margin:auto}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:rgba(0,0,0,.35);
+  padding:12px 16px;
+  border-radius:18px;
+  margin-bottom:15px;
+  box-shadow:0 0 20px rgba(255,215,0,.25);
+}
+
+.brand{font-weight:700;font-size:16px;color:#ffd700}
+.status{font-size:12px;opacity:.8}
+
+h1{text-align:center;color:#ffd700}
+
+.tabs{
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.tabs button{
+  flex:1;
+  padding:14px;
+  border-radius:18px;
+  border:none;
+  background:#001c44;
+  color:#ffd700;
+  font-weight:700;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.tabs button.active{
+  background:linear-gradient(45deg,#ffd700,#ffae00);
+  color:#001933;
+}
+
+.controls,.filters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:12px;
+  background:rgba(255,255,255,.07);
+  padding:14px;
+  border-radius:18px;
+  backdrop-filter:blur(10px);
+}
+
+input,select,button{
+  padding:12px;
+  border-radius:14px;
+  border:none;
+  font-family:'Inter',sans-serif;
+  font-size:14px;
+}
+
+input,select{
+  flex:1;
+  background:#001933;
+  color:#fff;
+  border:1px solid rgba(255,215,0,.6);
+}
+
+button{
+  background:linear-gradient(45deg,#ffd700,#ffae00);
+  cursor:pointer;
+  font-weight:700;
+}
+
+.month{
+  margin-bottom:16px;
+  background:rgba(255,255,255,.06);
+  border-radius:20px;
+  padding:14px;
+  box-shadow:0 0 20px rgba(255,215,0,.18);
+}
+
+.month h2{
+  margin:0 0 8px;
+  color:#ffd700;
+  border-bottom:1px solid rgba(255,215,0,.4);
+  padding-bottom:6px;
+}
+
+.task{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  background:rgba(0,0,0,.45);
+  padding:12px;
+  border-radius:16px;
+  margin:6px 0;
+  transition:.25s;
+}
+
+.task.done{
+  background:linear-gradient(45deg,#008f44,#00c96f);
+}
+
+.task span{
+  flex:1;
+  font-size:13px;
+}
+
+.task button{
+  background:#ff3b3b;
+  color:#fff;
+  padding:6px 12px;
+}
+
+.task input[type=checkbox]{
+  width:30px;
+  height:30px;
+  accent-color:#ffd700;
+  cursor:pointer;
+}
+
+@media(max-width:700px){
+  h1{font-size:18px}
+  .tabs button{font-size:12px}
+}
