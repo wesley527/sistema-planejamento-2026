@@ -14,6 +14,14 @@ function normalizeMonth(m){
 async function initApp() {
   tasks = await GitHubSync.load();
 
+  // Registrar listener de sincronização em tempo real (Firebase)
+  if(typeof GitHubSync.onChange === 'function'){
+    GitHubSync.onChange((data) => {
+      tasks = Array.isArray(data) ? data : [];
+      renderApp();
+    });
+  }
+
   // Migração: caso o arquivo antigo tenha chaves "pedagogico" / "comercial"
   if(!Array.isArray(tasks)){
     const migrated = [];

@@ -10,9 +10,41 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="css/style.css">
+<!-- Inicializa Firebase via módulos (escolha: CDN modular sem build) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-analytics.js";
+  import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+
+  // Configuração do Firebase (substitua se necessário)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCZI4Rb35MkIPiVk-xWz03eZwEaKeaxFhE",
+    authDomain: "sistema-de-planejamento.firebaseapp.com",
+    projectId: "sistema-de-planejamento",
+    storageBucket: "sistema-de-planejamento.firebasestorage.app",
+    messagingSenderId: "151928826868",
+    appId: "1:151928826868:web:2b3bc73114259530ab67a1",
+    measurementId: "G-7L9KYGE46R"
+  };
+
+  // Inicializa Firebase
+  const app = initializeApp(firebaseConfig);
+  try { getAnalytics(app); } catch(e) { /* Analytics pode falhar em ambientes sem suporte */ }
+  const db = getDatabase(app);
+
+  // Expondo helpers mínimos para os scripts não-modulares existentes
+  window.__firebase = {
+    db,
+    ref: (path) => ref(db, path),
+    onValue,
+    set,
+    get
+  };
+  window.firebaseInitialized = true;
+</script>
+
 <script defer src="js/github-sync.js"></script>
 <script defer src="js/app.js"></script>
-</head>
 
 <body>
 
@@ -51,6 +83,9 @@
   <div id="months"></div>
 
 </div>
+
+<!-- Entrypoint (usado quando executar via npm + vite) -->
+<script type="module" src="/src/main.js"></script>
 
 </body>
 </html>
