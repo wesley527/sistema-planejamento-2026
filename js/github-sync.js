@@ -7,7 +7,19 @@ const GitHubSync = {
     // Se o helper modular foi inicializado pelo <script type="module">, use-o
     if(window.__firebase && !this._dbRef){
       try{
-        this._dbRef = window.__firebase.ref('/tasks_premium_2026');
+        // Suporta projeto compartilhado via URL (ex: ?project=escola123)
+        let project = null;
+        try{ project = new URLSearchParams(location.search).get('project'); }catch(e){ project = null; }
+
+        if(project){
+          this._dbRef = window.__firebase.ref(`/projects/${project}/tasks`);
+          const el = document.getElementById('syncStatus'); if(el) el.innerText = `🔗 Projeto: ${project}`;
+        } else if(window.__firebase.refForUser){
+          this._dbRef = window.__firebase.refForUser('tasks');
+          const el = document.getElementById('syncStatus'); if(el) el.innerText = '🔐 Conectado (anônimo)';
+        } else {
+          this._dbRef = window.__firebase.ref('/tasks_premium_2026');
+        }
 
         window.__firebase.onValue(this._dbRef, snapshot => {
           const data = snapshot.val() || [];

@@ -15,6 +15,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-analytics.js";
   import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
   // Configuração do Firebase (substitua se necessário)
   const firebaseConfig = {
@@ -31,15 +32,56 @@
   const app = initializeApp(firebaseConfig);
   try { getAnalytics(app); } catch(e) { /* Analytics pode falhar em ambientes sem suporte */ }
   const db = getDatabase(app);
+  const auth = getAuth(app);
 
-  // Expondo helpers mínimos para os scripts não-modulares existentes
+  // Expondo helpers mínimos para os scripts não-modulares existentes (serão extendidos quando o usuário autenticado for obtido)
   window.__firebase = {
     db,
+    auth,
     ref: (path) => ref(db, path),
     onValue,
     set,
     get
   };
+
+  // Autenticação anônima: expõe uid e ref por usuário quando estiver disponível
+  signInAnonymously(auth).then(({ user }) => {
+    window.__firebase.uid = user.uid;
+    window.__firebase.refForUser = (p) => ref(db, `/users/${user.uid}/${p}`);
+    if(document && document.getElementById){
+      const s = document.getElementById('syncStatus');
+      if(s) s.innerText = '🔐 Conectado (anônimo)';
+    }
+
+    // Migração: se existir dados globais e o usuário ainda não tiver dados, copiar para /users/{uid}/tasks
+    (async () => {
+      try{
+        const perRef = window.__firebase.refForUser('tasks');
+        const globalRef = ref(db, '/tasks_premium_2026');
+        const perSnap = await window.__firebase.get(perRef);
+        const globalSnap = await window.__firebase.get(globalRef);
+        const perData = perSnap && perSnap.val();
+        const globalData = globalSnap && globalSnap.val();
+        if((perData == null || (Array.isArray(perData) && perData.length === 0)) && globalData){
+          await window.__firebase.set(perRef, globalData);
+          console.info('Migrated global tasks to per-user tasks');
+        }
+      }catch(e){
+        console.warn('Migration error', e);
+      }
+    })();
+
+  }).catch(e => {
+    console.warn('Anon sign-in failed', e);
+  });
+
+  onAuthStateChanged(auth, (user) => {
+    if(user){
+      window.__firebase.uid = user.uid;
+      window.__firebase.refForUser = (p) => ref(db, `/users/${user.uid}/${p}`);
+    }
+  });
+
   window.firebaseInitialized = true;
 </script>
 

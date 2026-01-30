@@ -1,6 +1,7 @@
 // Módulo para inicializar Firebase usando o SDK npm (modular)
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref as dbRef, onValue, set as dbSet, get as dbGet } from 'firebase/database';
+import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCZI4Rb35MkIPiVk-xWz03eZwEaKeaxFhE",
@@ -18,6 +19,13 @@ let initialized = false;
 export function initFirebase() {
   if(initialized) return {
     ref: (p) => dbRef(db, p),
+    refForUser: (uid, p) => dbRef(db, `/users/${uid}/${p}`),
+    onAuthStateChanged,
+    signInAnonymously: async () => {
+      const auth = getAuth();
+      const res = await signInAnonymously(auth);
+      return res.user;
+    },
     onValue,
     set: dbSet,
     get: dbGet
@@ -25,10 +33,18 @@ export function initFirebase() {
 
   const app = initializeApp(firebaseConfig);
   db = getDatabase(app);
+  const auth = getAuth(app);
   initialized = true;
 
   return {
     ref: (p) => dbRef(db, p),
+    refForUser: (uid, p) => dbRef(db, `/users/${uid}/${p}`),
+    auth,
+    onAuthStateChanged,
+    signInAnonymously: async () => {
+      const res = await signInAnonymously(auth);
+      return res.user;
+    },
     onValue,
     set: dbSet,
     get: dbGet
