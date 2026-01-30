@@ -4,41 +4,61 @@ let activeTab = 'ped';
 // Carregar dados do GitHub na inicialização
 let tasks = [];
 
+// Normaliza o nome do mês (case-insensitive) para os valores padronizados em `months`
+function normalizeMonth(m){
+  if(!m) return m;
+  const found = months.find(mm => mm.toLowerCase() === String(m).toLowerCase());
+  return found || String(m);
+}
+
 async function initApp() {
   tasks = await GitHubSync.load();
+
+  // Migração: caso o arquivo antigo tenha chaves "pedagogico" / "comercial"
+  if(!Array.isArray(tasks)){
+    const migrated = [];
+    if(tasks && tasks.pedagogico){
+      tasks.pedagogico.forEach(t => migrated.push({...t, done:false, type:'ped', m: normalizeMonth(t.m || t.month || '')}));
+    }
+    if(tasks && tasks.comercial){
+      tasks.comercial.forEach(t => migrated.push({...t, done:false, type:'com', m: normalizeMonth(t.m || t.month || '')}));
+    }
+    tasks = migrated;
+    await save();
+  }
   
   const ped = [
-   {d:"15/jan",a:"Palestra Janeiro Branco",m:"Janeiro"},
-   {d:"17/jan",a:"Aferição de Pressão Arterial",m:"Janeiro"},
-   {d:"19 á 24",a:"Campeonato de Digitação",m:"Janeiro"},
-   {d:"26 á 31",a:"Olimpíada de Informática",m:"Janeiro"},
-   {d:"07/fev",a:"Filme +1",m:"Fevereiro"},
-   {d:"13/fev",a:"Bloquinho",m:"Fevereiro"},
-   {d:"10/mar",a:"Palestra Inteligência Artificial",m:"Março"},
-   {d:"16/mar",a:"Palestra Inteligência Emocional",m:"Março"},
-   {d:"02/abr",a:"Conscientização do Autismo",m:"Abril"},
-   {d:"10/abr",a:"Caça aos Ovos",m:"Abril"},
-   {d:"31/mai",a:"Campeonato de Futebol",m:"Maio"},
-   {d:"22/jun",a:"São João",m:"Junho"},
-   {d:"13/out",a:"Dia das Crianças",m:"Outubro"},
-   {d:"09 á 13",a:"Novembro Azul",m:"Novembro"},
-   {d:"24/dez",a:"Especial de Natal",m:"Dezembro"}
+   {d:"15/jan",a:"Palestra Janeiro Branco",m:normalizeMonth("Janeiro")},
+   {d:"17/jan",a:"Aferição de Pressão Arterial",m:normalizeMonth("Janeiro")},
+   {d:"19 á 24",a:"Campeonato de Digitação",m:normalizeMonth("Janeiro")},
+   {d:"26 á 31",a:"Olimpíada de Informática",m:normalizeMonth("Janeiro")},
+   {d:"07/fev",a:"Filme +1",m:normalizeMonth("Fevereiro")},
+   {d:"13/fev",a:"Bloquinho",m:normalizeMonth("Fevereiro")},
+   {d:"10/mar",a:"Palestra Inteligência Artificial",m:normalizeMonth("Março")},
+   {d:"16/mar",a:"Palestra Inteligência Emocional",m:normalizeMonth("Março")},
+   {d:"02/abr",a:"Conscientização do Autismo",m:normalizeMonth("Abril")},
+   {d:"10/abr",a:"Caça aos Ovos",m:normalizeMonth("Abril")},
+   {d:"31/mai",a:"Campeonato de Futebol",m:normalizeMonth("Maio")},
+   {d:"22/jun",a:"São João",m:normalizeMonth("Junho")},
+   {d:"13/out",a:"Dia das Crianças",m:normalizeMonth("Outubro")},
+   {d:"09 á 13",a:"Novembro Azul",m:normalizeMonth("Novembro")},
+   {d:"24/dez",a:"Especial de Natal",m:normalizeMonth("Dezembro")}
   ];
 
   const com = [
-   {d:"09/jan",a:"Colagem nos postes + urnas",m:"Janeiro"},
-   {d:"17/jan",a:"Captação + Aferição PA",m:"Janeiro"},
-   {d:"23/fev",a:"Início captação nas escolas",m:"Fevereiro"},
-   {d:"MARÇO",a:"Captação mês completo",m:"Março"},
-   {d:"01 á 10",a:"Entrega lista associação autismo",m:"Abril"},
-   {d:"20/abr",a:"Café da manhã mães autistas",m:"Abril"},
-   {d:"31/mai",a:"Torneio de futebol",m:"Maio"},
-   {d:"22/jun",a:"Festa junina",m:"Junho"},
-   {d:"13 á 15",a:"Colar QR Code nos postes",m:"Julho"},
-   {d:"01 á 30",a:"Captação mês completo",m:"Setembro"},
-   {d:"05 á 10",a:"Recebimento de brinquedos",m:"Outubro"},
-   {d:"14/nov",a:"Ação Papai Noel",m:"Novembro"},
-   {d:"24/dez",a:"Papai Noel + urnas",m:"Dezembro"}
+   {d:"09/jan",a:"Colagem nos postes + urnas",m:normalizeMonth("Janeiro")},
+   {d:"17/jan",a:"Captação + Aferição PA",m:normalizeMonth("Janeiro")},
+   {d:"23/fev",a:"Início captação nas escolas",m:normalizeMonth("Fevereiro")},
+   {d:"MARÇO",a:"Captação mês completo",m:normalizeMonth("Março")},
+   {d:"01 á 10",a:"Entrega lista associação autismo",m:normalizeMonth("Abril")},
+   {d:"20/abr",a:"Café da manhã mães autistas",m:normalizeMonth("Abril")},
+   {d:"31/mai",a:"Torneio de futebol",m:normalizeMonth("Maio")},
+   {d:"22/jun",a:"Festa junina",m:normalizeMonth("Junho")},
+   {d:"13 á 15",a:"Colar QR Code nos postes",m:normalizeMonth("Julho")},
+   {d:"01 á 30",a:"Captação mês completo",m:normalizeMonth("Setembro")},
+   {d:"05 á 10",a:"Recebimento de brinquedos",m:normalizeMonth("Outubro")},
+   {d:"14/nov",a:"Ação Papai Noel",m:normalizeMonth("Novembro")},
+   {d:"24/dez",a:"Papai Noel + urnas",m:normalizeMonth("Dezembro")}
   ];
 
   // Se não houver tarefas salvas, usar as padrões
@@ -49,15 +69,15 @@ async function initApp() {
   }
   
   renderApp();
-}
+} 
 
 const monthsDiv = document.getElementById('months');
 const monthSel = document.getElementById('month');
 const filterMonth = document.getElementById('filterMonth');
 
 months.forEach(m => {
-  monthSel.innerHTML += `<option>${m}</option>`;
-  filterMonth.innerHTML += `<option>${m}</option>`;
+  monthSel.innerHTML += `<option value="${m}">${m}</option>`;
+  filterMonth.innerHTML += `<option value="${m}">${m}</option>`;
 });
 
 async function save(){
@@ -74,7 +94,7 @@ function switchTab(tab){
 function addTask(){
   const d = date.value.trim();
   const a = action.value.trim();
-  const m = month.value;
+  const m = normalizeMonth(month.value);
 
   if(!d || !a) return alert('Preencha todos os campos');
 
