@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start:server": "node server/server.js",
+    "dev:server": "cd server && npm run dev"
   },
   "repository": {
     "type": "git",
@@ -22,7 +24,6 @@
   },
   "homepage": "https://github.com/wesley527/sistema-planejamento-2026#readme",
   "dependencies": {
-    "firebase": "^12.8.0"
   },
   "devDependencies": {
     "vite": "^7.3.1"

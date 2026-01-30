@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: sistema-planejamento-api
+    env: node
+    plan: starter
+    repo: https://github.com/wesley527/sistema-planejamento-2026
+    branch: feature/mongo-backend-deploy
+    buildCommand: cd server && npm ci
+    startCommand: cd server && npm start
+    envVars:
+      - key: MONGO_URI
+        value: "$MONGO_URI"

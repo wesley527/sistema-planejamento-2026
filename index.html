@@ -10,79 +10,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="css/style.css">
-<!-- Inicializa Firebase via módulos (escolha: CDN modular sem build) -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-analytics.js";
-  import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
-  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-
-  // Configuração do Firebase (substitua se necessário)
-  const firebaseConfig = {
-    apiKey: "AIzaSyCZI4Rb35MkIPiVk-xWz03eZwEaKeaxFhE",
-    authDomain: "sistema-de-planejamento.firebaseapp.com",
-    projectId: "sistema-de-planejamento",
-    storageBucket: "sistema-de-planejamento.firebasestorage.app",
-    messagingSenderId: "151928826868",
-    appId: "1:151928826868:web:2b3bc73114259530ab67a1",
-    measurementId: "G-7L9KYGE46R"
-  };
-
-  // Inicializa Firebase
-  const app = initializeApp(firebaseConfig);
-  try { getAnalytics(app); } catch(e) { /* Analytics pode falhar em ambientes sem suporte */ }
-  const db = getDatabase(app);
-  const auth = getAuth(app);
-
-  // Expondo helpers mínimos para os scripts não-modulares existentes (serão extendidos quando o usuário autenticado for obtido)
-  window.__firebase = {
-    db,
-    auth,
-    ref: (path) => ref(db, path),
-    onValue,
-    set,
-    get
-  };
-
-  // Autenticação anônima: expõe uid e ref por usuário quando estiver disponível
-  signInAnonymously(auth).then(({ user }) => {
-    window.__firebase.uid = user.uid;
-    window.__firebase.refForUser = (p) => ref(db, `/users/${user.uid}/${p}`);
-    if(document && document.getElementById){
-      const s = document.getElementById('syncStatus');
-      if(s) s.innerText = '🔐 Conectado (anônimo)';
-    }
-
-    // Migração: se existir dados globais e o usuário ainda não tiver dados, copiar para /users/{uid}/tasks
-    (async () => {
-      try{
-        const perRef = window.__firebase.refForUser('tasks');
-        const globalRef = ref(db, '/tasks_premium_2026');
-        const perSnap = await window.__firebase.get(perRef);
-        const globalSnap = await window.__firebase.get(globalRef);
-        const perData = perSnap && perSnap.val();
-        const globalData = globalSnap && globalSnap.val();
-        if((perData == null || (Array.isArray(perData) && perData.length === 0)) && globalData){
-          await window.__firebase.set(perRef, globalData);
-          console.info('Migrated global tasks to per-user tasks');
-        }
-      }catch(e){
-        console.warn('Migration error', e);
-      }
-    })();
-
-  }).catch(e => {
-    console.warn('Anon sign-in failed', e);
-  });
-
-  onAuthStateChanged(auth, (user) => {
-    if(user){
-      window.__firebase.uid = user.uid;
-      window.__firebase.refForUser = (p) => ref(db, `/users/${user.uid}/${p}`);
-    }
-  });
-
-  window.firebaseInitialized = true;
+<!-- Configuração para usar um backend REST (Mongo) -->
+<!-- Copie `config.js.example` para `config.js` e altere `window.API_BASE` para o endpoint do seu servidor -->
+<script src="config.js" defer></script>
+<script>
+  // Se não definido em config.js, usar localhost:4000 por padrão (pode ser substituído em produção)
+  window.API_BASE = window.API_BASE || 'http://localhost:4000';
 </script>
 
 <script defer src="js/github-sync.js"></script>

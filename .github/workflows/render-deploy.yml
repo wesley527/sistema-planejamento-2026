@@ -1,0 +1,25 @@
+name: Render deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/mongo-backend-deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup jq
+        run: sudo apt-get update && sudo apt-get install -y jq curl
+
+      - name: Run render deploy script
+        env:
+          RENDER_KEY: ${{ secrets.RENDER_API_KEY }}
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+        run: |
+          chmod +x ./deploy/render-deploy.sh
+          ./deploy/render-deploy.sh

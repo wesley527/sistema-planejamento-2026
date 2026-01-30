@@ -1,0 +1,9 @@
+// Copy this file to `config.js` and set `window.API_BASE` to your server URL.
+// Example:
+// window.API_BASE = 'https://api.yourdomain.com';
+
+// Default value used if you don't create a `config.js` file:
+// window.API_BASE = 'http://localhost:4000';
+
+// Remove the comment and set your API base below when ready:
+// window.API_BASE = 'https://api.my-project.com';
